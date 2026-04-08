@@ -1,0 +1,70 @@
+# Deploy static Next.js export (out/) to Cloudways over SSH/rsync.
+#
+# Prerequisites (Cloudways):
+# - Enable SSH/SFTP for the target application and note host, user, port, path.
+# - Prefer a dedicated folder or application for static HTML; do not rsync over
+#   WordPress core unless you intend to replace the site.
+#
+# GitHub repo → Settings → Secrets and variables → Actions:
+#   CLOUDWAYS_SSH_HOST    e.g. IP or ssh.cloudways.com (from panel)
+#   CLOUDWAYS_SSH_USER    SSH username
+#   CLOUDWAYS_SSH_KEY     Private key (full PEM, including BEGIN/END lines)
+#   CLOUDWAYS_SSH_PORT    optional, default 22
+#   CLOUDWAYS_REMOTE_PATH absolute path on server, e.g. .../public_html
+#                             or .../public_html/yuzu for a subfolder
+#
+# Optional: set CLOUDWAYS_RSYNC_EXTRA to e.g. "--delete" to mirror out/ exactly
+# (removes remote files not in out/ — use only on a dedicated deploy path).
+
+name: Deploy static site to Cloudways
+
+on:
+  workflow_dispatch:
+  # Uncomment to deploy on every push to main (only if CLOUDWAYS_REMOTE_PATH is a
+  # dedicated folder — never point at WordPress public_html with --delete).
+  # push:
+  #   branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install and build
+        env:
+          NEXT_PUBLIC_SITE_URL: https://wordpress-1344959-6336336.cloudwaysapps.com
+          NEXT_PUBLIC_BASE_PATH: ""
+        run: |
+          npm ci
+          npm run build
+
+      - name: Prepare SSH key
+        env:
+          SSH_HOST: ${{ secrets.CLOUDWAYS_SSH_HOST }}
+          SSH_PORT: ${{ secrets.CLOUDWAYS_SSH_PORT }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.CLOUDWAYS_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          P="${SSH_PORT:-22}"
+          ssh-keyscan -p "$P" -H "$SSH_HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
+
+      - name: Rsync out/ to Cloudways
+        env:
+          HOST: ${{ secrets.CLOUDWAYS_SSH_HOST }}
+          USER: ${{ secrets.CLOUDWAYS_SSH_USER }}
+          PORT: ${{ secrets.CLOUDWAYS_SSH_PORT }}
+          DEST: ${{ secrets.CLOUDWAYS_REMOTE_PATH }}
+          EXTRA: ${{ secrets.CLOUDWAYS_RSYNC_EXTRA }}
+        run: |
+          test -n "$HOST" && test -n "$USER" && test -n "$DEST" || { echo "Missing CLOUDWAYS_* secrets"; exit 1; }
+          P="${PORT:-22}"
+          rsync -avz -e "ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=accept-new -p $P" \
+            $EXTRA \
+            out/ "${USER}@${HOST}:${DEST}/"
