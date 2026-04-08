@@ -1,0 +1,36 @@
+@import "tailwindcss";
+
+/*
+  Design tokens — mirror in Figma:
+  Colours: charcoal #1A1A1A, cream #FAF8F5, yuzu #C4A35A, sage #8B9A8B
+  Breakpoints: sm 640, md 768, lg 1024, xl 1280, 2xl 1536
+  Spacing: 4px base grid; section vertical rhythm lg:py-24 md:py-20 py-16
+*/
+@theme {
+  --color-yuzu-charcoal: #1a1a1a;
+  --color-yuzu-cream: #faf8f5;
+  --color-yuzu-cream-dark: #f5f3ef;
+  --color-yuzu-gold: #c4a35a;
+  --color-yuzu-gold-hover: #b39550;
+  --color-yuzu-sage: #8b9a8b;
+  --color-yuzu-body: #3d3d3d;
+  --color-yuzu-muted: #6b6560;
+
+  --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  background-color: var(--color-yuzu-cream);
+  color: var(--color-yuzu-body);
+}
