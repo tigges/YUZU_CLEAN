@@ -1,3 +1,11 @@
+/**
+ * Canonical public URL (no trailing slash). Set NEXT_PUBLIC_SITE_URL at build time
+ * for GitHub Pages, e.g. https://YOUR_USER.github.io/YOUR_REPO
+ */
+export const publicSiteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
+  "https://yuzuhairbeauty.co.uk";
+
 /** Update before launch: real address, phone, booking URL, coordinates, social handles. */
 export const site = {
   name: "Yuzu Hair & Beauty",

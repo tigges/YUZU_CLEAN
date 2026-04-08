@@ -1,4 +1,4 @@
-import { site } from "@/lib/site";
+import { publicSiteUrl, site } from "@/lib/site";
 
 export function JsonLd() {
   const data = {
@@ -6,10 +6,10 @@ export function JsonLd() {
     "@type": "HairSalon",
     name: site.name,
     description: site.description,
-    url: "https://yuzuhairbeauty.co.uk",
+    url: publicSiteUrl,
     telephone: site.phone,
     email: site.email,
-    image: "https://yuzuhairbeauty.co.uk/og.jpg",
+    image: `${publicSiteUrl}/og.jpg`,
     address: {
       "@type": "PostalAddress",
       streetAddress: site.address.streetAddress,

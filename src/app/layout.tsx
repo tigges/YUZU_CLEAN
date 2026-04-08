@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { DM_Sans, Fraunces } from "next/font/google";
+import { publicSiteUrl } from "@/lib/site";
 import "./globals.css";
 
 const dmSans = DM_Sans({
@@ -14,11 +15,10 @@ const fraunces = Fraunces({
   display: "swap",
 });
 
-const siteUrl = "https://yuzuhairbeauty.co.uk";
 const siteName = "Yuzu Hair & Beauty";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
+  metadataBase: new URL(`${publicSiteUrl}/`),
   title: {
     default: `${siteName} | Hair Salon London`,
     template: `%s | ${siteName}`,
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     title: `${siteName} | London`,
     description:
       "Calm, precise hair and beauty in London. Book your consultation.",
-    url: siteUrl,
+    url: publicSiteUrl,
     siteName,
     locale: "en_GB",
     type: "website",
